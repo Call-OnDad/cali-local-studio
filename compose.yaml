@@ -1,0 +1,18 @@
+services:
+  studio:
+    build: .
+    ports:
+      - "8780:8780"
+    environment:
+      STUDIO_DOWNLOAD_MODELS: ${STUDIO_DOWNLOAD_MODELS:-1}
+      STUDIO_ALLOWED_NETWORKS: ${STUDIO_ALLOWED_NETWORKS:-127.0.0.0/8,::1/128,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
+      STUDIO_ALLOWED_HOSTS: ${STUDIO_ALLOWED_HOSTS:-}
+    volumes:
+      - studio-projects:/app/data
+      - studio-models:/app/models
+    restart: unless-stopped
+    cpus: 2
+    mem_limit: 2g
+volumes:
+  studio-projects:
+  studio-models:

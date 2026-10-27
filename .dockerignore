@@ -1,0 +1,14 @@
+.git
+.venv
+data
+models
+tools
+private
+voice-data
+vendor
+backups
+review
+verification
+__pycache__
+.env
+*.log
