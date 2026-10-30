@@ -230,9 +230,7 @@ def pipeline(jid,spec):
 def worker():
     while not STOP.is_set():
         with db() as c:
-            c.execute('BEGIN IMMEDIATE')
-            row=c.execute("SELECT * FROM jobs WHERE status='queued' AND cancel=0 ORDER BY created LIMIT 1").fetchone()
-            if row:c.execute("UPDATE jobs SET status='running',stage='Starting',updated=? WHERE id=?",(time.time(),row['id']))
+            row=c.execute("UPDATE jobs SET status='running',stage='Starting',updated=? WHERE id=(SELECT id FROM jobs WHERE status='queued' AND cancel=0 ORDER BY created LIMIT 1) RETURNING *",(time.time(),)).fetchone()
         if not row:STOP.wait(.5);continue
         jid=row['id']
         try:pipeline(jid,json.loads(row['spec']))
@@ -272,7 +270,7 @@ async def private_access(request:Request,call_next):
         return JSONResponse({'detail':'Studio is available only on the local network'},status_code=403)
     if request.method not in ('GET','HEAD','OPTIONS'):
         origin=request.headers.get('origin')
-        if origin and origin!=str(request.base_url).rstrip('/'):
+        if origin is None or origin!=str(request.base_url).rstrip('/'):
             return JSONResponse({'detail':'Cross-origin request rejected'},status_code=403)
     response=await call_next(request)
     response.headers['X-Content-Type-Options']='nosniff'

@@ -18,6 +18,7 @@ class Controls(unittest.TestCase):
         app.STOP.clear()
         self.patch=patch.object(app,'worker',lambda:None);self.patch.start()
         self.ctx=TestClient(app.app,base_url='http://127.0.0.1:8780',client=('127.0.0.1',50000));self.client=self.ctx.__enter__()
+        self.client.headers.update({'Origin': 'http://127.0.0.1:8780'})
 
     def tearDown(self):
         self.ctx.__exit__(None,None,None);self.patch.stop()

@@ -5,7 +5,7 @@ import time
 import httpx
 
 p=argparse.ArgumentParser();p.add_argument('--url',default='http://127.0.0.1:8780');p.add_argument('--timeout',type=int,default=600);args=p.parse_args()
-with httpx.Client(base_url=args.url,trust_env=False,timeout=30) as client:
+with httpx.Client(base_url=args.url,trust_env=False,timeout=30,headers={'Origin': args.url}) as client:
     client.get('/api/system').raise_for_status()
     r=client.post('/api/jobs',json={'title':'Self-hosted smoke test','character':'human','voice':'local-cori','text':'Hello. This fresh speech and animated video were created on this server, using local software.'});r.raise_for_status();jid=r.json()['id']
     deadline=time.monotonic()+args.timeout
